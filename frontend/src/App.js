@@ -1,47 +1,47 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchInteractions } from './store/interactionSlice';
+import AIChatAssistant from './components/AIChatAssistant';
+import LogInteractionForm from './components/LogInteractionForm';
+import InteractionsList from './components/InteractionsList';
+import { Stethoscope } from 'lucide-react';
 
 function App() {
-  const [doctor, setDoctor] = useState("");
-  const [notes, setNotes] = useState("");
-  const [response, setResponse] = useState("");
+  const dispatch = useDispatch();
 
-  const logInteraction = async () => {
-    const res = await axios.post("http://127.0.0.1:8000/log-interaction", {
-      doctor_name: doctor,
-      notes: notes
-    });
-    setResponse(JSON.stringify(res.data));
-  };
+  useEffect(() => {
+    dispatch(fetchInteractions());
+  }, [dispatch]);
 
   return (
-    <div style={{ display: "flex", padding: "20px" }}>
+    <div className="app-container">
+      <header className="header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Stethoscope size={28} color="#60a5fa" />
+          <h1>AI CRM - HCP Module</h1>
+        </div>
+        <div className="badge positive">v1.0.0 Connected</div>
+      </header>
       
-      {/* LEFT FORM */}
-      <div style={{ width: "50%" }}>
-        <h2>Log Interaction</h2>
+      <main className="main-content">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', height: '100%', overflowY: 'auto', paddingRight: '0.5rem' }}>
+          <section className="glass-panel">
+            <h2 style={{ marginBottom: '1.5rem', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Manual Entry
+            </h2>
+            <LogInteractionForm />
+          </section>
+          
+          <section className="glass-panel" style={{ flex: 1 }}>
+            <h2 style={{ marginBottom: '1.5rem', color: '#c084fc' }}>Recent Interactions</h2>
+            <InteractionsList />
+          </section>
+        </div>
 
-        <input
-          placeholder="Doctor Name"
-          onChange={(e) => setDoctor(e.target.value)}
-        />
-        <br /><br />
-
-        <textarea
-          placeholder="Notes"
-          onChange={(e) => setNotes(e.target.value)}
-        />
-        <br /><br />
-
-        <button onClick={logInteraction}>Submit</button>
-      </div>
-
-      {/* RIGHT AI */}
-      <div style={{ width: "50%", marginLeft: "20px" }}>
-        <h2>AI Output</h2>
-        <pre>{response}</pre>
-      </div>
-
+        <aside className="glass-panel" style={{ height: 'calc(100vh - 120px)' }}>
+          <AIChatAssistant />
+        </aside>
+      </main>
     </div>
   );
 }
